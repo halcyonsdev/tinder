@@ -1,6 +1,7 @@
 package com.halcyon.tinder.userservice.service;
 
 import com.halcyon.tinder.userservice.dto.user.UserProfileDto;
+import com.halcyon.tinder.userservice.dto.user.UserPutRequest;
 import com.halcyon.tinder.userservice.exception.UserNotFoundException;
 import com.halcyon.tinder.userservice.mapper.UserMapper;
 import com.halcyon.tinder.userservice.model.User;
@@ -44,6 +45,15 @@ public class UserService {
     public UserProfileDto getUserProfileById(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
+
+        return userMapper.toProfile(user);
+    }
+
+    public UserProfileDto update(UserPutRequest userPutRequest) {
+        User user = getCurrentUser();
+
+        userMapper.updateUserFromPutRequest(userPutRequest, user);
+        user = save(user);
 
         return userMapper.toProfile(user);
     }

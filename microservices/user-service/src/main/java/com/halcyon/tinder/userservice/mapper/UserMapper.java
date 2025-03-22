@@ -2,10 +2,12 @@ package com.halcyon.tinder.userservice.mapper;
 
 import com.halcyon.tinder.userservice.dto.auth.SignUpRequest;
 import com.halcyon.tinder.userservice.dto.user.UserProfileDto;
+import com.halcyon.tinder.userservice.dto.user.UserPutRequest;
 import com.halcyon.tinder.userservice.model.User;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Mapper(componentModel = "spring")
@@ -16,4 +18,9 @@ public interface UserMapper {
     User toEntity(SignUpRequest signUpRequest, @Context PasswordEncoder passwordEncoder);
 
     UserProfileDto toProfile(User user);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "phoneNumber", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    void updateUserFromPutRequest(UserPutRequest userPutRequest, @MappingTarget User user);
 }
