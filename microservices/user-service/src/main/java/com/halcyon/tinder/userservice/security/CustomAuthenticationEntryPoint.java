@@ -1,6 +1,7 @@
 package com.halcyon.tinder.userservice.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.halcyon.tinder.userservice.dto.error.ErrorDetailsResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,6 +34,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         OutputStream responseStream = response.getOutputStream();
         var objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
 
         objectMapper.writeValue(responseStream, errorDetails);
         responseStream.flush();

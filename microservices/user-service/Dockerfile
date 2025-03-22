@@ -2,10 +2,10 @@ FROM gradle:8.5-jdk21 as builder
 
 WORKDIR /app
 
-COPY settings.gradle.kts build.gradle.kts microservices/user-service/
-COPY microservices/user-service/src microservices/user-service/src
+COPY ../build.gradle.kts /app/
+COPY ../settings.gradle.kts /app/
 
-WORKDIR /app/microservices/user-service
+COPY . /app/
 
 RUN gradle build --no-daemon
 

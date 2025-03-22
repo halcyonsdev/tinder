@@ -10,7 +10,10 @@ java {
 }
 
 subprojects {
-    apply(plugin = "org.springframework.boot")
+    if (project.path != ":microservices") {
+        apply(plugin = "org.springframework.boot")
+    }
+
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "java")
 
