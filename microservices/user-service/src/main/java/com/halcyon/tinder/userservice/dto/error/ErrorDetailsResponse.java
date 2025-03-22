@@ -1,11 +1,10 @@
 package com.halcyon.tinder.userservice.dto.error;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.Instant;
 
 @Builder
 @Data

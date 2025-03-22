@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,8 +20,8 @@ public class JwtProvider {
     private final SecretKey refreshKey;
 
     public JwtProvider(
-            @Value("${jwt.secret.access}") String accessToken,
-            @Value("${jwt.secret.refresh}") String refreshToken) {
+                       @Value("${jwt.secret.access}") String accessToken,
+                       @Value("${jwt.secret.refresh}") String refreshToken) {
         this.accessKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessToken));
         this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshToken));
     }
@@ -69,10 +68,5 @@ public class JwtProvider {
         } catch (Exception ignored) {
             return false;
         }
-    }
-
-    public String getCurrentUserPhone() {
-        var jwtAuthentication = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        return jwtAuthentication.getPhoneNumber();
     }
 }

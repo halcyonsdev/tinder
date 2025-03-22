@@ -4,10 +4,10 @@ import com.halcyon.tinder.userservice.dto.error.ErrorDetailsResponse;
 import com.halcyon.tinder.userservice.exception.ApiException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
-
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
@@ -97,6 +98,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetailsResponse> handleAllExceptions(Exception e) {
+        log.error(e.getMessage(), e);
+
         String message = "Something went wrong";
 
         var errorDetails = ErrorDetailsResponse.builder()
