@@ -34,10 +34,23 @@ services:
       - user-network
     restart: always
 
+  redis:
+    image: redis:7.4.0-alpine
+    container_name: redis
+    ports:
+      - "6379:${REDIS_PORT}"
+    restart: always
+    networks:
+      - user-network
+    volumes:
+      - redis-data:/data
+
 networks:
   user-network:
     driver: bridge
 
 volumes:
   postgres-data:
+    driver: local
+  redis-data:
     driver: local

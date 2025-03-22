@@ -38,7 +38,7 @@ public class UserService {
     }
 
     public User getCurrentUser() {
-        String phoneNumber = jwtProvider.getCurrentUserPhone();
+        String phoneNumber = jwtProvider.getJwtAuthentication().getPhoneNumber();
         return findByPhoneNumber(phoneNumber);
     }
 

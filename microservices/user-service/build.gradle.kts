@@ -32,6 +32,8 @@ dependencies {
 
     implementation("org.mapstruct:mapstruct:$mapstructVersion")
     annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+
+    implementation(project(":common:redis-cache"))
 }
 
 flyway {

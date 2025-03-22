@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
 
     private final UserService userService;
+    private final TokenRevocationService tokenRevocationService;
     private final JwtProvider jwtProvider;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -48,6 +49,11 @@ public class AuthenticationService {
         }
 
         return getAuthResponse(user.getPhoneNumber());
+    }
+
+    public void logout() {
+        String jwtToken = jwtProvider.getJwtAuthentication().getToken();
+        tokenRevocationService.revokeToken(jwtToken);
     }
 
     public AuthenticationResponse getTokensByRefresh(String refreshToken, boolean isRefresh) {

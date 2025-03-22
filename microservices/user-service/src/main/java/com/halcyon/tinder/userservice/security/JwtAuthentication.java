@@ -15,6 +15,7 @@ public class JwtAuthentication implements Authentication {
 
     private boolean authenticated;
     private String phoneNumber;
+    private String token;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -33,7 +33,10 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers(
                                         "/api/v1/users/ping",
-                                        "/api/v1/auth/**")
+                                        "/api/v1/auth/sign-up",
+                                        "/api/v1/auth/sign-in",
+                                        "/api/v1/auth/access",
+                                        "/api/v1/auth/refresh")
                                 .permitAll()
                                 .anyRequest().authenticated())
 

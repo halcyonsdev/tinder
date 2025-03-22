@@ -71,8 +71,13 @@ public class JwtProvider {
         }
     }
 
-    public String getCurrentUserPhone() {
-        var jwtAuthentication = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        return jwtAuthentication.getPhoneNumber();
+    public long getRemainingTokenLifetime(String jwtToken) {
+        Claims claims = extractAllClaims(jwtToken, false);
+        Date expiration = claims.getExpiration();
+        return (expiration.getTime() - System.currentTimeMillis()) / 1000;
+    }
+
+    public JwtAuthentication getJwtAuthentication() {
+        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
     }
 }

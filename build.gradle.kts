@@ -10,7 +10,7 @@ java {
 }
 
 subprojects {
-    if (project.path != ":microservices") {
+    if (project.path != ":microservices" && !project.path.startsWith(":common")) {
         apply(plugin = "org.springframework.boot")
     }
 

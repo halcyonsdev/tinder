@@ -2,6 +2,7 @@ package com.halcyon.tinder.userservice.filter;
 
 import com.halcyon.tinder.userservice.security.JwtAuthentication;
 import com.halcyon.tinder.userservice.security.JwtProvider;
+import com.halcyon.tinder.userservice.service.TokenRevocationService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final TokenRevocationService tokenRevocationService;
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -31,13 +33,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken = getTokenFromRequest(request);
         boolean isRefresh = false;
 
-        if (jwtToken != null && jwtProvider.isValidToken(jwtToken, isRefresh)) {
+        if (jwtToken != null && jwtProvider.isValidToken(jwtToken, isRefresh) && !tokenRevocationService.isRevoked(jwtToken)) {
             Claims claims = jwtProvider.extractAllClaims(jwtToken, isRefresh);
 
-            var jwtAuthentication = new JwtAuthentication(true, claims.getSubject());
+            var jwtAuthentication = new JwtAuthentication(true, claims.getSubject(), jwtToken);
             SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
         }
 
+        System.out.println(jwtToken);
         filterChain.doFilter(request, response);
     }
 
