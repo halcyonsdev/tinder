@@ -53,6 +53,11 @@ public class UserService {
         User user = getCurrentUser();
 
         userMapper.updateUserFromPutRequest(userPutRequest, user);
+
+        if (user.getPreferences() != null) {
+            user.getPreferences().setUser(user);
+        }
+
         user = save(user);
 
         return userMapper.toProfile(user);

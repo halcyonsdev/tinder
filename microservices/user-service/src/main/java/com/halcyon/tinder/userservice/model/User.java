@@ -1,5 +1,6 @@
 package com.halcyon.tinder.userservice.model;
 
+import com.halcyon.tinder.userservice.model.support.Gender;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,13 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @Column(name = "age", nullable = false)
+    private Integer age;
+
+    @Column(name = "gender", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -39,4 +47,7 @@ public class User {
     @Column(name = "interests")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> interests;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserPreferences preferences;
 }

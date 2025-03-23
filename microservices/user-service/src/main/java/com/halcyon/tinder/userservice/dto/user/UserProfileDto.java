@@ -2,6 +2,8 @@ package com.halcyon.tinder.userservice.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.halcyon.tinder.userservice.model.support.Gender;
+import jakarta.validation.constraints.*;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
@@ -22,9 +24,18 @@ public class UserProfileDto {
     @JsonProperty("last_name")
     private String lastName;
 
+    @JsonProperty("age")
+    private Integer age;
+
+    @JsonProperty("gender")
+    private Gender gender;
+
     @JsonProperty("bio")
     private String bio;
 
     @JsonProperty("interests")
     private List<String> interests;
+
+    @JsonProperty("preferences")
+    private UserPreferencesDto preferences;
 }

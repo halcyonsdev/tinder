@@ -29,6 +29,11 @@ public class AuthenticationService {
         }
 
         User user = userMapper.toEntity(signUpRequest, passwordEncoder);
+
+        if (user.getPreferences() != null) {
+            user.getPreferences().setUser(user);
+        }
+
         userService.save(user);
 
         return getAuthResponse(user.getPhoneNumber());

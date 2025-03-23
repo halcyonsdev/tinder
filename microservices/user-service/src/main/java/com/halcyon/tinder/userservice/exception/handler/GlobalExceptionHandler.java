@@ -1,6 +1,8 @@
 package com.halcyon.tinder.userservice.exception.handler;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.halcyon.tinder.userservice.dto.error.ErrorDetailsResponse;
+import com.halcyon.tinder.userservice.dto.error.ValidationErrorsResponse;
 import com.halcyon.tinder.userservice.exception.ApiException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
@@ -10,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,23 +41,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
             ConstraintViolationException.class,
-            MethodArgumentTypeMismatchException.class })
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(Exception ex) {
+            MethodArgumentTypeMismatchException.class,
+            HttpMessageNotReadableException.class })
+    public ResponseEntity<ValidationErrorsResponse> handleValidationExceptions(Exception ex) {
         List<Map<String, String>> errors = new ArrayList<>();
 
-        if (ex instanceof MethodArgumentNotValidException) {
-            errors = getMethodArgumentNotValidErrors((MethodArgumentNotValidException) ex);
-        } else if (ex instanceof ConstraintViolationException) {
-            errors = getConstraintViolationErrors((ConstraintViolationException) ex);
-        } else if (ex instanceof MethodArgumentTypeMismatchException) {
-            errors = getMethodArgumentTypeMismatchErrors((MethodArgumentTypeMismatchException) ex);
+        if (ex instanceof MethodArgumentNotValidException exception) {
+            errors = getMethodArgumentNotValidErrors(exception);
+        } else if (ex instanceof ConstraintViolationException exception) {
+            errors = getConstraintViolationErrors(exception);
+        } else if (ex instanceof MethodArgumentTypeMismatchException exception) {
+            errors = getMethodArgumentTypeMismatchErrors(exception);
+        } else if (ex instanceof HttpMessageNotReadableException exception) {
+            errors = getJsonParseErrors(exception);
         }
 
-        Map<String, Object> response = Map.of(
-                "status", HttpStatus.BAD_REQUEST.value(),
-                "errors", errors);
+        var validationErrorsResponse = ValidationErrorsResponse.builder()
+                .timestamp(Instant.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .errors(errors)
+                .build();
 
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.badRequest().body(validationErrorsResponse);
     }
 
     private List<Map<String, String>> getMethodArgumentNotValidErrors(MethodArgumentNotValidException ex) {
@@ -88,6 +96,35 @@ public class GlobalExceptionHandler {
         return List.of(Map.of(
                 "field", toSnakeCase(parameter),
                 "message", message));
+    }
+
+    private List<Map<String, String>> getJsonParseErrors(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof com.fasterxml.jackson.databind.exc.InvalidFormatException formatException) {
+            String fieldName = formatException.getPath().stream()
+                    .map(JsonMappingException.Reference::getFieldName)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining("."));
+
+            String message = String.format(
+                    "Invalid value '%s' for field '%s'",
+                    formatException.getValue(),
+                    fieldName);
+
+            if (formatException.getTargetType().isEnum()) {
+                message += String.format(". Expected one of: %s",
+                        Arrays.toString(formatException.getTargetType().getEnumConstants()));
+            }
+
+            return List.of(Map.of(
+                    "field", fieldName,
+                    "message", message));
+        }
+
+        return List.of(Map.of(
+                "field", "unknown",
+                "message", "Invalid JSON format or unexpected value."));
     }
 
     private String toSnakeCase(String original) {
