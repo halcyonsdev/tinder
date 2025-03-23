@@ -3,7 +3,6 @@ package com.halcyon.tinder.userservice.dto.user;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.halcyon.tinder.userservice.model.support.Gender;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

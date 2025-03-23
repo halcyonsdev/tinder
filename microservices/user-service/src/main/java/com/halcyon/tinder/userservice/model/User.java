@@ -2,7 +2,6 @@ package com.halcyon.tinder.userservice.model;
 
 import com.halcyon.tinder.userservice.model.support.Gender;
 import jakarta.persistence.*;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
