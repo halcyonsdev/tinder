@@ -2,11 +2,14 @@ package com.halcyon.tinder.userservice.model;
 
 import com.halcyon.tinder.userservice.model.support.Gender;
 import jakarta.persistence.*;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -21,6 +24,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private UUID id;
+
+    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    private Instant createdAt;
 
     @Column(name = "phone_number", unique = true, nullable = false)
     private String phoneNumber;

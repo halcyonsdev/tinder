@@ -3,6 +3,8 @@ package com.halcyon.tinder.userservice.dto.user;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.halcyon.tinder.userservice.model.support.Gender;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
@@ -13,6 +15,9 @@ public class UserProfileDto {
 
     @JsonProperty("id")
     private UUID id;
+
+    @JsonProperty("created_at")
+    private Instant createdAt;
 
     @JsonProperty("phone_number")
     private String phoneNumber;
