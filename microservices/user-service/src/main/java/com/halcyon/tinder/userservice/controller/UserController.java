@@ -10,6 +10,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,6 +51,12 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
 
+    @DeleteMapping("/avatar")
+    public ResponseEntity<UserProfileDto> deleteAvatar() {
+        UserProfileDto profile = userService.deleteAvatar();
+        return ResponseEntity.ok(profile);
+    }
+
     @GetMapping("/image/{imageName}")
     public ResponseEntity<Resource> downloadImage(@PathVariable String imageName) {
         ImageData imageData = userService.downloadImage(imageName);
@@ -73,5 +80,11 @@ public class UserController {
     public ResponseEntity<List<String>> getUserGallery(@PathVariable UUID userId) {
         List<String> gallery = userService.getGallery(userId);
         return ResponseEntity.ok(gallery);
+    }
+
+    @DeleteMapping("/gallery/{imageName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteGalleryImage(@PathVariable String imageName) {
+        userService.deleteGalleryImage(imageName);
     }
 }

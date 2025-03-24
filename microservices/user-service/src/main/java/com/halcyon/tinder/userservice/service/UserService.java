@@ -2,6 +2,8 @@ package com.halcyon.tinder.userservice.service;
 
 import com.halcyon.tinder.userservice.dto.user.UserProfileDto;
 import com.halcyon.tinder.userservice.dto.user.UserPutRequest;
+import com.halcyon.tinder.userservice.exception.AccessDeniedException;
+import com.halcyon.tinder.userservice.exception.ImageNotFoundException;
 import com.halcyon.tinder.userservice.exception.UserNotFoundException;
 import com.halcyon.tinder.userservice.mapper.UserMapper;
 import com.halcyon.tinder.userservice.model.User;
@@ -109,5 +111,30 @@ public class UserService {
                 .stream()
                 .map(UserImage::getImageName)
                 .toList();
+    }
+
+    public UserProfileDto deleteAvatar() {
+        User user = getCurrentUser();
+
+        if (user.getAvatar() != null) {
+            imageStorageService.deleteImage(user.getAvatar());
+        }
+
+        user.setAvatar(null);
+
+        return userMapper.toProfile(save(user));
+    }
+
+    public void deleteGalleryImage(String imageName) {
+        User user = getCurrentUser();
+        UserImage userImage = userImageRepository.findByImageName(imageName)
+                .orElseThrow(() -> new ImageNotFoundException("Image with name " + imageName + " not found in gallery"));
+
+        if (!userImage.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("This image belongs to another user");
+        }
+
+        imageStorageService.deleteImage(imageName);
+        userImageRepository.delete(userImage);
     }
 }
