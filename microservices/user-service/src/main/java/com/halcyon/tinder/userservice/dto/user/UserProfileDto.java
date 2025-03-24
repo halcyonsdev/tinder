@@ -36,6 +36,9 @@ public class UserProfileDto {
     @JsonProperty("bio")
     private String bio;
 
+    @JsonProperty("avatar")
+    private String avatar;
+
     @JsonProperty("interests")
     private List<String> interests;
 

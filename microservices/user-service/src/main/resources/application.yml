@@ -28,3 +28,10 @@ jwt:
   secret:
     access: ${JWT_SECRET_ACCESS}
     refresh: ${JWT_SECRET_REFRESH}
+
+minio:
+  access:
+    user: ${MINIO_ROOT_USER}
+    secret: ${MINIO_ROOT_PASSWORD}
+  bucket: ${MINIO_BUCKET}
+  url: http://${MINIO_HOST}:${MINIO_PORT}

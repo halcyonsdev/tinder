@@ -50,10 +50,16 @@ public class User {
     @Column(name = "bio")
     private String bio;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @Column(name = "interests")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> interests;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserPreferences preferences;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserImage> gallery;
 }
