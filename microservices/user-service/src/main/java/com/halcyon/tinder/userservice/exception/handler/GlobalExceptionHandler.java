@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,6 +34,20 @@ public class GlobalExceptionHandler {
                 .status(status.value())
                 .error(e.getClass().getSimpleName())
                 .message(message)
+                .build();
+
+        return new ResponseEntity<>(errorDetails, status);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorDetailsResponse> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        HttpStatus status = HttpStatus.METHOD_NOT_ALLOWED;
+
+        var errorDetails = ErrorDetailsResponse.builder()
+                .timestamp(Instant.now())
+                .status(status.value())
+                .error(e.getClass().getSimpleName())
+                .message(e.getMessage())
                 .build();
 
         return new ResponseEntity<>(errorDetails, status);
