@@ -1,7 +1,6 @@
 package com.halcyon.tinder.rediscache;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Duration;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class CacheManager {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     public void save(String key, Object value, Duration timeToLive) {
         redisTemplate.opsForValue().set(key, value, timeToLive);
@@ -39,12 +39,13 @@ public class CacheManager {
             return Optional.empty();
         }
 
-        var objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-
         T result = objectMapper.convertValue(value.get(), targetClass);
         log.info("Fetched cached value with key {}", key);
 
         return Optional.of(result);
+    }
+
+    public void delete(String key) {
+        redisTemplate.delete(key);
     }
 }

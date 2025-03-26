@@ -1,5 +1,6 @@
 package com.halcyon.tinder.userservice.service;
 
+import com.halcyon.tinder.rediscache.CacheManager;
 import com.halcyon.tinder.userservice.dto.user.UserProfileDto;
 import com.halcyon.tinder.userservice.dto.user.UserPutRequest;
 import com.halcyon.tinder.userservice.exception.AccessDeniedException;
@@ -12,7 +13,9 @@ import com.halcyon.tinder.userservice.repository.UserImageRepository;
 import com.halcyon.tinder.userservice.repository.UserRepository;
 import com.halcyon.tinder.userservice.security.JwtProvider;
 import com.halcyon.tinder.userservice.service.support.ImageData;
+import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,9 @@ public class UserService {
     private final ImageStorageService imageStorageService;
     private final JwtProvider jwtProvider;
     private final UserMapper userMapper;
+    private final CacheManager cacheManager;
+
+    private static final String USER_CACHE_PREFIX = "user-profile:";
 
     public User save(User user) {
         return userRepository.save(user);
@@ -52,7 +58,17 @@ public class UserService {
     }
 
     public UserProfileDto getUserProfileById(UUID userId) {
-        return userMapper.toProfile(findById(userId));
+        String key = USER_CACHE_PREFIX + userId;
+        Optional<UserProfileDto> profileOptional = cacheManager.fetch(key, UserProfileDto.class);
+
+        if (profileOptional.isPresent()) {
+            return profileOptional.get();
+        }
+
+        UserProfileDto profile = userMapper.toProfile(findById(userId));
+        cacheManager.save(key, profile, Duration.ofMinutes(10));
+
+        return profile;
     }
 
     private User findById(UUID userId) {
@@ -70,6 +86,7 @@ public class UserService {
         }
 
         user = save(user);
+        cacheManager.delete(USER_CACHE_PREFIX + user);
 
         return userMapper.toProfile(user);
     }
@@ -84,6 +101,7 @@ public class UserService {
         String imageName = imageStorageService.uploadImage(image);
         user.setAvatar(imageName);
 
+        cacheManager.delete(USER_CACHE_PREFIX + user);
         return userMapper.toProfile(save(user));
     }
 
@@ -122,6 +140,7 @@ public class UserService {
 
         user.setAvatar(null);
 
+        cacheManager.delete(USER_CACHE_PREFIX + user);
         return userMapper.toProfile(save(user));
     }
 
