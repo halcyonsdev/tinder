@@ -1,17 +1,18 @@
 package com.halcyon.tinder.userservice.service;
 
+import com.halcyon.tinder.exceptioncore.UserNotFoundException;
+import com.halcyon.tinder.jwtcore.JwtProvider;
 import com.halcyon.tinder.rediscache.CacheManager;
-import com.halcyon.tinder.userservice.dto.user.UserProfileDto;
-import com.halcyon.tinder.userservice.dto.user.UserPutRequest;
+import com.halcyon.tinder.userservice.dto.CreateUserRequest;
+import com.halcyon.tinder.userservice.dto.UserProfileDto;
+import com.halcyon.tinder.userservice.dto.UserPutRequest;
 import com.halcyon.tinder.userservice.exception.AccessDeniedException;
 import com.halcyon.tinder.userservice.exception.ImageNotFoundException;
-import com.halcyon.tinder.userservice.exception.UserNotFoundException;
 import com.halcyon.tinder.userservice.mapper.UserMapper;
 import com.halcyon.tinder.userservice.model.User;
 import com.halcyon.tinder.userservice.model.UserImage;
 import com.halcyon.tinder.userservice.repository.UserImageRepository;
 import com.halcyon.tinder.userservice.repository.UserRepository;
-import com.halcyon.tinder.userservice.security.JwtProvider;
 import com.halcyon.tinder.userservice.service.support.ImageData;
 import java.time.Duration;
 import java.util.List;
@@ -28,11 +29,21 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserImageRepository userImageRepository;
     private final ImageStorageService imageStorageService;
-    private final JwtProvider jwtProvider;
     private final UserMapper userMapper;
     private final CacheManager cacheManager;
+    private final JwtProvider jwtProvider;
 
     private static final String USER_CACHE_PREFIX = "user-profile:";
+
+    public void create(CreateUserRequest createUserRequest) {
+        User user = userMapper.toEntity(createUserRequest);
+
+        if (user.getPreferences() != null) {
+            user.getPreferences().setUser(user);
+        }
+
+        save(user);
+    }
 
     public User save(User user) {
         return userRepository.save(user);
@@ -41,10 +52,6 @@ public class UserService {
     public User findByPhoneNumber(String phoneNumber) {
         return userRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new UserNotFoundException("User with phone number " + phoneNumber + " not found"));
-    }
-
-    public boolean existsByPhoneNumber(String phoneNumber) {
-        return userRepository.existsByPhoneNumber(phoneNumber);
     }
 
     public UserProfileDto getCurrentUserProfile() {

@@ -1,7 +1,7 @@
 package com.halcyon.tinder.userservice.controller;
 
-import com.halcyon.tinder.userservice.dto.user.UserProfileDto;
-import com.halcyon.tinder.userservice.dto.user.UserPutRequest;
+import com.halcyon.tinder.userservice.dto.UserProfileDto;
+import com.halcyon.tinder.userservice.dto.UserPutRequest;
 import com.halcyon.tinder.userservice.service.UserService;
 import com.halcyon.tinder.userservice.service.support.ImageData;
 import jakarta.validation.Valid;

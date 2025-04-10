@@ -13,8 +13,27 @@ services:
       - microservices/user-service/.env
     depends_on:
       - user-postgres
+      - kafka
+      - zookeeper
     networks:
-      - user-network
+      - backend-network
+    restart: always
+
+  auth-service:
+    image: auth-service:latest
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: microservices/auth-service/Dockerfile
+    ports:
+      - "8081:${AUTH_SERVICE_PORT}"
+    env_file:
+      - microservices/auth-service/.env
+    depends_on:
+      - kafka
+      - zookeeper
+    networks:
+      - backend-network
     restart: always
 
   user-postgres:
@@ -31,7 +50,7 @@ services:
     env_file:
       - microservices/user-service/.env
     networks:
-      - user-network
+      - backend-network
     restart: always
 
   redis:
@@ -41,7 +60,7 @@ services:
       - "6379:${REDIS_PORT}"
     restart: always
     networks:
-      - user-network
+      - backend-network
     volumes:
       - redis-data:/data
 
@@ -62,13 +81,44 @@ services:
       - "${MINIO_PORT}:9000"
       - "${MINIO_CONSOLE_PORT}:9001"
     networks:
-      - user-network
+      - backend-network
     volumes:
       - minio-data:/data
     env_file: .env
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - backend-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - backend-network
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
 networks:
-  user-network:
+  backend-network:
     driver: bridge
 
 volumes:
