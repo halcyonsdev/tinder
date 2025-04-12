@@ -1,5 +1,6 @@
 plugins {
-    id("java")
+    kotlin("jvm") version "1.9.24"
+    kotlin("plugin.lombok") version "1.9.24"
 }
 
 group = "com.halcyon.tinder"
@@ -16,4 +17,15 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs += listOf("-Xjsr305=strict")
+        jvmTarget = "21"
+    }
 }

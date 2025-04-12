@@ -1,8 +1,9 @@
 plugins {
-    id("java")
+    kotlin("jvm") version "1.9.24"
+    kotlin("plugin.lombok") version "1.9.24"
 }
 
-group = "com.halcyon"
+group = "com.halcyon.tinder"
 version = "1.0.0"
 
 repositories {
@@ -23,4 +24,15 @@ dependencies {
 
     implementation(project(":common:redis-cache"))
     implementation(project(":common:exception-core"))
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs += listOf("-Xjsr305=strict")
+        jvmTarget = "21"
+    }
 }

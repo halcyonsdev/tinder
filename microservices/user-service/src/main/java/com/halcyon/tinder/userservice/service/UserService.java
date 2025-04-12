@@ -16,7 +16,6 @@ import com.halcyon.tinder.userservice.repository.UserRepository;
 import com.halcyon.tinder.userservice.service.support.ImageData;
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -66,13 +65,13 @@ public class UserService {
 
     public UserProfileDto getUserProfileById(UUID userId) {
         String key = USER_CACHE_PREFIX + userId;
-        Optional<UserProfileDto> profileOptional = cacheManager.fetch(key, UserProfileDto.class);
+        UserProfileDto profile = cacheManager.fetch(key, UserProfileDto.class);
 
-        if (profileOptional.isPresent()) {
-            return profileOptional.get();
+        if (profile != null) {
+            return profile;
         }
 
-        UserProfileDto profile = userMapper.toProfile(findById(userId));
+        profile = userMapper.toProfile(findById(userId));
         cacheManager.save(key, profile, Duration.ofMinutes(10));
 
         return profile;

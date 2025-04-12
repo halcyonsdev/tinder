@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         scanBasePackages = {
                 "com.halcyon.tinder.authservice",
                 "com.halcyon.tinder.jwtcore",
-                "com.halcyon.tinder.exceptioncore"
+                "com.halcyon.tinder.exceptioncore",
+                "com.halcyon.tinder.rediscache"
         })
 public class AuthServiceApplication {
 

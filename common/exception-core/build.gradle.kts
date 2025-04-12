@@ -1,10 +1,9 @@
 plugins {
     kotlin("jvm") version "1.9.24"
     kotlin("plugin.lombok") version "1.9.24"
-    id("io.freefair.lombok") version "8.13"
 }
 
-group = "com.halcyon"
+group = "com.halcyon.tinder"
 version = "1.0.0"
 
 repositories {
