@@ -23,3 +23,10 @@ spec:
                 name: user-service-external
                 port:
                   number: 80
+          - path: /config(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: config-service
+                port:
+                  number: 8888

@@ -9,3 +9,5 @@ include("common:jwt-core")
 findProject(":common:jwt-core")?.name = "jwt-core"
 include("common:exception-core")
 findProject(":common:exception-core")?.name = "exception-core"
+include("microservices:config-service")
+findProject(":microservices:config-service")?.name = "config-service"

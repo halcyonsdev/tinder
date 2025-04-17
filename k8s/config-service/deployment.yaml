@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-service
+  template:
+    metadata:
+      labels:
+        app: config-service
+    spec:
+      containers:
+        - name: config-service
+          image: halcyons/config-service:latest
+          ports:
+            - containerPort: 8888
+          env:
+            - name: SPRING_CLOUD_CONFIG_SERVER_GIT_URI
+              valueFrom:
+                secretKeyRef:
+                  name: config-service-secret
+                  key: SPRING_CLOUD_CONFIG_SERVER_GIT_URI
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                secretKeyRef:
+                  name: config-service-secret
+                  key: KAFKA_BOOTSTRAP_SERVERS

@@ -1,6 +1,20 @@
 version: "3.8"
 
 services:
+  config-service:
+    image: config-service:latest
+    container_name: config-service
+    build:
+      context: .
+      dockerfile: microservices/config-service/Dockerfile
+    ports:
+      - "8888:8888"
+    env_file:
+      - microservices/config-service/.env
+    networks:
+      - backend-network
+    restart: always
+
   user-service:
     image: user-service:latest
     container_name: user-service
@@ -15,6 +29,7 @@ services:
       - user-postgres
       - kafka
       - zookeeper
+      - config-service
     networks:
       - backend-network
     restart: always
@@ -127,6 +142,7 @@ services:
     depends_on:
       - auth-service
       - user-service
+      - config-service
     networks:
       - backend-network
 

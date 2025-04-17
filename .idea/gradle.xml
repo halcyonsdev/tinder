@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/common/redis-cache" />
             <option value="$PROJECT_DIR$/microservices" />
             <option value="$PROJECT_DIR$/microservices/auth-service" />
+            <option value="$PROJECT_DIR$/microservices/config-service" />
             <option value="$PROJECT_DIR$/microservices/user-service" />
           </set>
         </option>

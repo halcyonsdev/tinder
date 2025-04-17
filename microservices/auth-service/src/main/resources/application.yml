@@ -4,16 +4,14 @@ server:
 spring:
   application:
     name: auth-service
-
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-
-jwt:
-  secret:
-    access: ${JWT_SECRET_ACCESS}
-    refresh: ${JWT_SECRET_REFRESH}
+  config:
+    import: configserver:http://config-service:8888
+  cloud:
+    config:
+      uri: http://config-service:8888
+    bus:
+      enabled: true
+    stream:
+      kafka:
+        binder:
+          brokers: kafka:9092

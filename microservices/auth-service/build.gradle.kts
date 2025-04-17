@@ -5,7 +5,7 @@ plugins {
     id("com.google.protobuf") version "0.9.5"
 }
 
-group = "com.halcyon"
+group = "com.halcyon.tinder"
 version = "1.0.0"
 
 repositories {
@@ -22,6 +22,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.cloud:spring-cloud-starter-config:4.2.1")
+    implementation("org.springframework.cloud:spring-cloud-starter-bus-kafka:4.2.1")
 
     implementation("io.grpc:grpc-stub:1.71.0")
     implementation("io.grpc:grpc-protobuf:1.71.0")

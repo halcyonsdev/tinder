@@ -27,6 +27,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("io.github.lognet:grpc-spring-boot-starter:5.2.0")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.cloud:spring-cloud-starter-config:4.2.1")
+    implementation("org.springframework.cloud:spring-cloud-starter-bus-kafka:4.2.1")
 
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
