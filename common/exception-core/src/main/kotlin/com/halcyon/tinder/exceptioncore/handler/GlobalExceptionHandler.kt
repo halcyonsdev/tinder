@@ -5,6 +5,7 @@ import com.halcyon.tinder.exceptioncore.ApiException
 import com.halcyon.tinder.exceptioncore.ErrorDetailsResponse
 import com.halcyon.tinder.exceptioncore.ValidationErrorsResponse
 import feign.FeignException
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @ControllerAdvice
 class GlobalExceptionHandler {
@@ -149,6 +151,17 @@ class GlobalExceptionHandler {
                 )
             )
         }
+    }
+
+    @ExceptionHandler(NoResourceFoundException::class)
+    fun handleNoHandlerFoundException(e: NoResourceFoundException, request: HttpServletRequest): ResponseEntity<ErrorDetailsResponse> {
+        val errorDetails = ErrorDetailsResponse.builder()
+            .status(HttpStatus.NOT_FOUND.value())
+            .error("NoResourceFound")
+            .message("Endpoint ${request.requestURI} not found")
+            .build()
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails)
     }
 
     @ExceptionHandler(Exception::class)

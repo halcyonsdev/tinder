@@ -4,14 +4,5 @@ server:
 spring:
   application:
     name: auth-service
-  config:
-    import: configserver:http://config-service:8888
-  cloud:
-    config:
-      uri: http://config-service:8888
-    bus:
-      enabled: true
-    stream:
-      kafka:
-        binder:
-          brokers: kafka:9092
+  profiles:
+    active: dev

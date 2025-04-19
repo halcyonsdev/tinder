@@ -2,18 +2,15 @@ server:
   port: 8888
 
 spring:
+  application:
+    name: config-service
+
   cloud:
     config:
       server:
         git:
           uri: https://github.com/halcyonsdev/tinder-config-repo.git
-    bus:
-      enabled: true
-      id: config-server
-    stream:
-      kafka:
-        binder:
-          brokers: localhost:9092
+          default-label: main
 
 management:
   endpoints:
