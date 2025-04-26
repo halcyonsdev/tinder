@@ -2,6 +2,7 @@ package com.halcyon.tinder.authservice.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.halcyon.tinder.authservice.dto.support.Gender;
+import com.halcyon.tinder.authservice.dto.user.UserGeolocationDto;
 import com.halcyon.tinder.authservice.dto.user.UserPreferencesDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -53,4 +54,8 @@ public class SignUpRequest {
     @JsonProperty("preferences")
     @Valid
     private UserPreferencesDto preferences;
+
+    @JsonProperty("geolocation")
+    @Valid
+    private UserGeolocationDto geolocation;
 }

@@ -16,4 +16,5 @@ public class CreateUserRequest {
     private String bio;
     private List<String> interests;
     private UserPreferencesDto preferences;
+    private UserGeolocationDto geolocation;
 }

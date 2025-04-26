@@ -10,14 +10,17 @@ import com.halcyon.tinder.userservice.exception.AccessDeniedException;
 import com.halcyon.tinder.userservice.exception.ImageNotFoundException;
 import com.halcyon.tinder.userservice.mapper.UserMapper;
 import com.halcyon.tinder.userservice.model.User;
+import com.halcyon.tinder.userservice.model.UserGeolocation;
 import com.halcyon.tinder.userservice.model.UserImage;
 import com.halcyon.tinder.userservice.repository.UserImageRepository;
 import com.halcyon.tinder.userservice.repository.UserRepository;
 import com.halcyon.tinder.userservice.service.support.ImageData;
+import com.halcyon.tinder.userservice.util.PointFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +34,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final CacheManager cacheManager;
     private final JwtProvider jwtProvider;
+    private final PointFactory pointFactory;
 
     private static final String USER_CACHE_PREFIX = "user-profile:";
 
@@ -39,6 +43,12 @@ public class UserService {
 
         if (user.getPreferences() != null) {
             user.getPreferences().setUser(user);
+        }
+
+        var geolocation = createUserRequest.getGeolocation();
+        if (geolocation != null) {
+            Point location = pointFactory.createPoint(geolocation.getLongitude(), geolocation.getLatitude());
+            user.setGeolocation(new UserGeolocation(location, user));
         }
 
         save(user);

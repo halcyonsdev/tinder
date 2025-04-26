@@ -6,3 +6,5 @@ spring:
     name: user-service
   profiles:
     active: dev
+  config:
+    import: configserver:http://localhost:8888

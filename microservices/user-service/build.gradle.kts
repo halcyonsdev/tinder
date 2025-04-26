@@ -37,6 +37,7 @@ dependencies {
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
 
     implementation("org.postgresql:postgresql")
+    implementation("org.hibernate:hibernate-spatial:6.6.13.Final")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
 

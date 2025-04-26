@@ -44,4 +44,7 @@ public class UserProfileDto {
 
     @JsonProperty("preferences")
     private UserPreferencesDto preferences;
+
+    @JsonProperty("geolocation")
+    private UserGeolocationDto geolocation;
 }
