@@ -26,5 +26,6 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "phoneNumber", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "geolocation", ignore = true)
     void updateUserFromPutRequest(UserPutRequest userPutRequest, @MappingTarget User user);
 }

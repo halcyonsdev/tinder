@@ -40,4 +40,8 @@ public class UserPutRequest {
     @JsonProperty("preferences")
     @Valid
     private UserPreferencesDto preferences;
+
+    @JsonProperty("geolocation")
+    @Valid
+    private UserGeolocationDto geolocation;
 }

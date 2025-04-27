@@ -4,6 +4,7 @@ import com.halcyon.tinder.exceptioncore.UserNotFoundException;
 import com.halcyon.tinder.jwtcore.JwtProvider;
 import com.halcyon.tinder.rediscache.CacheManager;
 import com.halcyon.tinder.userservice.dto.CreateUserRequest;
+import com.halcyon.tinder.userservice.dto.UserGeolocationDto;
 import com.halcyon.tinder.userservice.dto.UserProfileDto;
 import com.halcyon.tinder.userservice.dto.UserPutRequest;
 import com.halcyon.tinder.userservice.exception.AccessDeniedException;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -65,6 +67,7 @@ public class UserService {
 
     public UserProfileDto getCurrentUserProfile() {
         User currentUser = getCurrentUser();
+        System.out.println(currentUser.getGeolocation());
         return userMapper.toProfile(currentUser);
     }
 
@@ -92,6 +95,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
     }
 
+    @Transactional
     public UserProfileDto update(UserPutRequest userPutRequest) {
         User user = getCurrentUser();
 
@@ -101,10 +105,26 @@ public class UserService {
             user.getPreferences().setUser(user);
         }
 
+        updateGeolocation(user, userPutRequest.getGeolocation());
+
         user = save(user);
         cacheManager.delete(USER_CACHE_PREFIX + user);
 
         return userMapper.toProfile(user);
+    }
+
+    private void updateGeolocation(User user, UserGeolocationDto geolocation) {
+        if (geolocation != null) {
+            Point location = pointFactory.createPoint(geolocation.getLongitude(), geolocation.getLatitude());
+
+            if (user.getGeolocation() != null) {
+                user.getGeolocation().setLocation(location);
+            } else {
+                user.setGeolocation(new UserGeolocation(location, user));
+            }
+        } else {
+            user.setGeolocation(null);
+        }
     }
 
     public UserProfileDto uploadAvatar(MultipartFile image) {
