@@ -5,9 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserGeolocationDto {
 
@@ -22,4 +27,11 @@ public class UserGeolocationDto {
     @Min(value = -90, message = "Latitude must not be less than -90")
     @Max(value = 90, message = "Latitude must not be more than 90")
     private Double latitude;
+
+    public UserGeolocationDto(Point point) {
+        if (point != null) {
+            this.longitude = point.getX();
+            this.latitude = point.getY();
+        }
+    }
 }

@@ -2,6 +2,8 @@ package com.halcyon.tinder.userservice.controller;
 
 import com.halcyon.tinder.userservice.dto.UserProfileDto;
 import com.halcyon.tinder.userservice.dto.UserPutRequest;
+import com.halcyon.tinder.userservice.service.UserDeckService;
+import com.halcyon.tinder.userservice.service.UserImageService;
 import com.halcyon.tinder.userservice.service.UserService;
 import com.halcyon.tinder.userservice.service.support.ImageData;
 import jakarta.validation.Valid;
@@ -21,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
+    private final UserImageService userImageService;
+    private final UserDeckService userDeckService;
 
     @GetMapping("/ping")
     public ResponseEntity<String> ping() {
@@ -47,19 +51,19 @@ public class UserController {
 
     @PostMapping("/avatar")
     public ResponseEntity<UserProfileDto> uploadAvatar(@RequestParam("image") MultipartFile image) {
-        UserProfileDto profile = userService.uploadAvatar(image);
+        UserProfileDto profile = userImageService.uploadAvatar(image);
         return ResponseEntity.ok(profile);
     }
 
     @DeleteMapping("/avatar")
     public ResponseEntity<UserProfileDto> deleteAvatar() {
-        UserProfileDto profile = userService.deleteAvatar();
+        UserProfileDto profile = userImageService.deleteAvatar();
         return ResponseEntity.ok(profile);
     }
 
     @GetMapping("/image/{imageName}")
     public ResponseEntity<Resource> downloadImage(@PathVariable String imageName) {
-        ImageData imageData = userService.downloadImage(imageName);
+        ImageData imageData = userImageService.downloadImage(imageName);
 
         var headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + imageData.imageName());
@@ -72,19 +76,25 @@ public class UserController {
 
     @PostMapping("/gallery")
     public ResponseEntity<UserProfileDto> uploadGallery(@RequestParam("image") List<MultipartFile> images) {
-        UserProfileDto profile = userService.uploadGalleryImages(images);
+        UserProfileDto profile = userImageService.uploadGalleryImages(images);
         return ResponseEntity.ok(profile);
     }
 
     @GetMapping("/{userId}/gallery")
     public ResponseEntity<List<String>> getUserGallery(@PathVariable UUID userId) {
-        List<String> gallery = userService.getGallery(userId);
+        List<String> gallery = userImageService.getGallery(userId);
         return ResponseEntity.ok(gallery);
     }
 
     @DeleteMapping("/gallery/{imageName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteGalleryImage(@PathVariable String imageName) {
-        userService.deleteGalleryImage(imageName);
+        userImageService.deleteGalleryImage(imageName);
+    }
+
+    @GetMapping("/deck")
+    public ResponseEntity<List<UserProfileDto>> getDeck() {
+        List<UserProfileDto> deck = userDeckService.getDeck();
+        return ResponseEntity.ok(deck);
     }
 }

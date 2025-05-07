@@ -6,9 +6,11 @@ import com.halcyon.tinder.userservice.model.support.Gender;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserProfileDto {
 

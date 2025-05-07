@@ -19,10 +19,17 @@ public class UserPreferences {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "age")
-    private Integer age;
+    @Column(name = "min_age")
+    private Integer minAge;
+
+    @Column(name = "max_age")
+    private Integer maxAge;
+
+    @Column(name = "distance_in_meters")
+    private Double distanceInMeters;
 
     @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @OneToOne

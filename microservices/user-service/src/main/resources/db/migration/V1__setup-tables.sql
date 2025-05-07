@@ -10,15 +10,17 @@ CREATE TABLE IF NOT EXISTS users
     password     VARCHAR(255)  NOT NULL,
     bio          VARCHAR(500),
     interests    JSONB,
-    avatar TEXT
+    avatar       TEXT
 );
 
 CREATE TABLE IF NOT EXISTS users_preferences
 (
-    id      UUID         PRIMARY KEY,
-    gender  VARCHAR(10),
-    age     INT,
-    user_id UUID         NOT NULL,
+    id                 UUID         PRIMARY KEY,
+    gender             VARCHAR(10),
+    min_age            INT,
+    max_age            INT,
+    distance_in_meters FLOAT4,
+    user_id            UUID         NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

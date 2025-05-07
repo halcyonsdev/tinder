@@ -3,36 +3,25 @@ package com.halcyon.tinder.userservice.service;
 import com.halcyon.tinder.exceptioncore.UserNotFoundException;
 import com.halcyon.tinder.jwtcore.JwtProvider;
 import com.halcyon.tinder.rediscache.CacheManager;
-import com.halcyon.tinder.userservice.dto.CreateUserRequest;
-import com.halcyon.tinder.userservice.dto.UserGeolocationDto;
-import com.halcyon.tinder.userservice.dto.UserProfileDto;
-import com.halcyon.tinder.userservice.dto.UserPutRequest;
-import com.halcyon.tinder.userservice.exception.AccessDeniedException;
-import com.halcyon.tinder.userservice.exception.ImageNotFoundException;
+import com.halcyon.tinder.userservice.dto.*;
+import com.halcyon.tinder.userservice.exception.WrongDataException;
 import com.halcyon.tinder.userservice.mapper.UserMapper;
 import com.halcyon.tinder.userservice.model.User;
 import com.halcyon.tinder.userservice.model.UserGeolocation;
-import com.halcyon.tinder.userservice.model.UserImage;
-import com.halcyon.tinder.userservice.repository.UserImageRepository;
 import com.halcyon.tinder.userservice.repository.UserRepository;
-import com.halcyon.tinder.userservice.service.support.ImageData;
 import com.halcyon.tinder.userservice.util.PointFactory;
 import java.time.Duration;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserImageRepository userImageRepository;
-    private final ImageStorageService imageStorageService;
     private final UserMapper userMapper;
     private final CacheManager cacheManager;
     private final JwtProvider jwtProvider;
@@ -44,6 +33,7 @@ public class UserService {
         User user = userMapper.toEntity(createUserRequest);
 
         if (user.getPreferences() != null) {
+            validatePreferences(createUserRequest.getPreferences());
             user.getPreferences().setUser(user);
         }
 
@@ -54,6 +44,13 @@ public class UserService {
         }
 
         save(user);
+    }
+
+    private void validatePreferences(UserPreferencesDto preferencesDto) {
+        if (preferencesDto.getMinAge() != null && preferencesDto.getMaxAge() != null
+                && preferencesDto.getMaxAge() < preferencesDto.getMinAge()) {
+            throw new WrongDataException("Max age can not be greater than min");
+        }
     }
 
     public User save(User user) {
@@ -67,7 +64,6 @@ public class UserService {
 
     public UserProfileDto getCurrentUserProfile() {
         User currentUser = getCurrentUser();
-        System.out.println(currentUser.getGeolocation());
         return userMapper.toProfile(currentUser);
     }
 
@@ -90,7 +86,7 @@ public class UserService {
         return profile;
     }
 
-    private User findById(UUID userId) {
+    public User findById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
     }
@@ -125,71 +121,5 @@ public class UserService {
         } else {
             user.setGeolocation(null);
         }
-    }
-
-    public UserProfileDto uploadAvatar(MultipartFile image) {
-        User user = getCurrentUser();
-
-        if (user.getAvatar() != null) {
-            imageStorageService.deleteImage(user.getAvatar());
-        }
-
-        String imageName = imageStorageService.uploadImage(image);
-        user.setAvatar(imageName);
-
-        cacheManager.delete(USER_CACHE_PREFIX + user);
-        return userMapper.toProfile(save(user));
-    }
-
-    public ImageData downloadImage(String imageName) {
-        return imageStorageService.downloadImage(imageName);
-    }
-
-    public UserProfileDto uploadGalleryImages(List<MultipartFile> images) {
-        User user = getCurrentUser();
-
-        for (var image : images) {
-            String imageName = imageStorageService.uploadImage(image);
-
-            var userImage = new UserImage(imageName, user);
-            userImageRepository.save(userImage);
-        }
-
-        return userMapper.toProfile(user);
-    }
-
-    public List<String> getGallery(UUID userId) {
-        User user = findById(userId);
-
-        return user.getGallery()
-                .stream()
-                .map(UserImage::getImageName)
-                .toList();
-    }
-
-    public UserProfileDto deleteAvatar() {
-        User user = getCurrentUser();
-
-        if (user.getAvatar() != null) {
-            imageStorageService.deleteImage(user.getAvatar());
-        }
-
-        user.setAvatar(null);
-
-        cacheManager.delete(USER_CACHE_PREFIX + user);
-        return userMapper.toProfile(save(user));
-    }
-
-    public void deleteGalleryImage(String imageName) {
-        User user = getCurrentUser();
-        UserImage userImage = userImageRepository.findByImageName(imageName)
-                .orElseThrow(() -> new ImageNotFoundException("Image with name " + imageName + " not found in gallery"));
-
-        if (!userImage.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("This image belongs to another user");
-        }
-
-        imageStorageService.deleteImage(imageName);
-        userImageRepository.delete(userImage);
     }
 }
