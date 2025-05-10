@@ -11,3 +11,5 @@ include("common:exception-core")
 findProject(":common:exception-core")?.name = "exception-core"
 include("microservices:config-service")
 findProject(":microservices:config-service")?.name = "config-service"
+include("microservices:swipe-service")
+findProject(":microservices:swipe-service")?.name = "swipe-service"

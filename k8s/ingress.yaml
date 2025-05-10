@@ -23,6 +23,13 @@ spec:
                 name: user-service-external
                 port:
                   number: 80
+          - path: /api/v1/swipes(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: swipe-service-external
+                port:
+                  number: 80
           - path: /config(/|$)(.*)
             pathType: ImplementationSpecific
             backend:

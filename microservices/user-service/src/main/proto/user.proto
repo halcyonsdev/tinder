@@ -16,6 +16,7 @@ message ExistsResponse {
 }
 
 message UserResponse {
-  string phone_number = 1;
-  string password = 2;
+  string id = 1;
+  string phone_number = 2;
+  string password = 3;
 }

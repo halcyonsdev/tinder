@@ -24,7 +24,7 @@ services:
       context: .
       dockerfile: microservices/user-service/Dockerfile
     ports:
-      - "8080:${USER_SERVICE_PORT}"
+      - "8080:8080"
     env_file:
       - microservices/user-service/.env
     environment:
@@ -34,6 +34,7 @@ services:
     depends_on:
       - user-postgres
       - kafka
+      - redis
       - zookeeper
       - config-service
     networks:
@@ -47,7 +48,7 @@ services:
       context: .
       dockerfile: microservices/auth-service/Dockerfile
     ports:
-      - "8081:${AUTH_SERVICE_PORT}"
+      - "8081:8081"
     env_file:
       - microservices/auth-service/.env
     environment:
@@ -56,7 +57,30 @@ services:
       - SPRING_CLOUD_CONFIG_NAME=auth-service
     depends_on:
       - kafka
+      - redis
       - zookeeper
+    networks:
+      - backend-network
+    restart: always
+
+  swipe-service:
+    image: swipe-service:latest
+    container_name: swipe-service
+    build:
+      context: .
+      dockerfile: microservices/swipe-service/Dockerfile
+    ports:
+      - "8082:8082"
+    env_file:
+      - microservices/swipe-service/.env
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+      - SPRING_CLOUD_CONFIG_NAME=swipe-service
+    depends_on:
+      - kafka
+      - zookeeper
+      - redis
     networks:
       - backend-network
     restart: always
@@ -65,9 +89,9 @@ services:
     image: postgis/postgis:17-3.5
     container_name: user-postgres
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - user-postgres-data:/var/lib/postgresql/data
     ports:
-      - "5433:${USER_POSTGRES_PORT}"
+      - "5431:5433"
     environment:
       POSTGRES_USER: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -78,11 +102,28 @@ services:
       - backend-network
     restart: always
 
+  swipe-postgres:
+    image: postgres:17.2
+    container_name: swipe-postgres
+    volumes:
+      - swipe-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${SWIPE_POSTGRES_DB}
+    env_file:
+      - microservices/swipe-service/.env
+    networks:
+      - backend-network
+    restart: always
+
   redis:
     image: redis:7.4.0-alpine
     container_name: redis
     ports:
-      - "6379:${REDIS_PORT}"
+      - "6379:6379"
     restart: always
     networks:
       - backend-network
@@ -103,8 +144,8 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: ${MINIO_BUCKET}
     ports:
-      - "${MINIO_PORT}:9000"
-      - "${MINIO_CONSOLE_PORT}:9001"
+      - "9000:9000"
+      - "9001:9001"
     networks:
       - backend-network
     volumes:
@@ -153,6 +194,7 @@ services:
       - auth-service
       - user-service
       - config-service
+      - swipe-service
     networks:
       - backend-network
 
@@ -161,7 +203,9 @@ networks:
     driver: bridge
 
 volumes:
-  postgres-data:
+  user-postgres-data:
+    driver: local
+  swipe-postgres-data:
     driver: local
   redis-data:
     driver: local

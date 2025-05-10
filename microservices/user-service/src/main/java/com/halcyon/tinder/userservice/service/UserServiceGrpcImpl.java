@@ -41,6 +41,7 @@ public class UserServiceGrpcImpl extends UserServiceGrpc.UserServiceImplBase {
         }
 
         var response = user.User.UserResponse.newBuilder()
+                .setId(userOptional.get().getId().toString())
                 .setPhoneNumber(userOptional.get().getPhoneNumber())
                 .setPassword(userOptional.get().getPassword())
                 .build();

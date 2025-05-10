@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swipe-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: swipe-service
+  template:
+    metadata:
+      labels:
+        app: swipe-service
+    spec:
+      containers:
+        - name: swipe-service
+          image: halcyons/swipe-service:latest
+          ports:
+            - containerPort: 8082
+          env:
+            - name: POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: swipe-service-secret
+                  key: POSTGRES_URL
+            - name: POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: swipe-service-secret
+                  key: POSTGRES_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: swipe-service-secret
+                  key: POSTGRES_PASSWORD
+
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: swipe-service-secret
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: swipe-service-secret
+                  key: REDIS_PORT
+
+            - name: JWT_SECRET_ACCESS
+              valueFrom:
+                secretKeyRef:
+                  name: swipe-service-secret
+                  key: JWT_SECRET_ACCESS
+            - name: JWT_SECRET_REFRESH
+              valueFrom:
+                secretKeyRef:
+                  name: swipe-service-secret
+                  key: JWT_SECRET_REFRESH

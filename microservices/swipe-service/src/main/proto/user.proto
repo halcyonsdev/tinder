@@ -3,16 +3,11 @@ syntax = "proto3";
 package user;
 
 service UserService {
-  rpc ExistsByPhoneNumber (PhoneNumberRequest) returns (ExistsResponse);
   rpc GetByPhoneNumber (PhoneNumberRequest) returns (UserResponse);
 }
 
 message PhoneNumberRequest {
   string phone_number = 1;
-}
-
-message ExistsResponse {
-  bool exists = 1;
 }
 
 message UserResponse {
